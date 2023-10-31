@@ -21,7 +21,7 @@ Setup Masks for MAX11615
 Config Masks for MAX11615
 ***************************************************/
 #define MAX11615_CONFIG_MASK 0x00               // 0000 0000
-
+#define MAX11615_CONFIG_SIGNLESHOT 0x60         // 0110 0000 //per datasheet, setting bits 6 and 5 to 1 converts only the channel selected by CS3-CS0
 //use bitwise or to assign values to the cs pins
 #define MAX11615_CHANNELSEL_0 0x00              // 0000 0000
 #define MAX11615_CHANNELSEL_1 0x02              // 0000 0010
@@ -32,15 +32,18 @@ Config Masks for MAX11615
 #define MAX11615_CHANNELSEL_6 0x0C              // 0000 1100
 #define MAX11615_CHANNELSEL_7 0x0E              // 0000 1110
 //Type of measurement
-#define MAX11615_SINGLESHOT 0x01                // 0000 0001
-#
+#define MAX11615_SINGLE_ENDED 0x01                // 0000 0001
+
 
 /*!
  *  @brief used to select a setup configuration upon startup for the MAX11615
  */
 typedef enum
 {
-
+    VDD_REF_INT_CLK = 1,
+    VDD_REF_EXT_CLK,
+    REF_INP_INT_CLK,
+    REF_OUT_INT_CLK
 }MAX11615Config_t
 
 class MAX11615
@@ -50,9 +53,13 @@ class MAX11615
     public:
     MAX11615();
     bool begin(uint8_t _i2cBus);
-    void configure();
+    void init(MAX11615Config_t _c = MAX11615Config_t::VDD_REF_INT_CLK);
     uint16_t readADC_SingleEnded(uint8_t channel);
-    uint16_t readADC_Differential(uint8_t channel);
+    uint16_t readADC_Differential_0_1();
+    uint16_t readADC_Differential_2_3();
+    uint16_t readADC_Differential_4_5();
+    uint16_t readADC_Differential_6_7();
+    uint16_t* readADC_Scan();
     float computeVolts(uint16_t counts);
     private:
     void writeRegister(uint8_t reg, uint16_t value);
@@ -60,6 +67,7 @@ class MAX11615
     uint16_t readRegister(uint8_t reg);
     uint8_t _buf[3];
     uint8_t _inBuf[3];
+    uint16_t _scanBuf[10];
 }
 
 #endif
