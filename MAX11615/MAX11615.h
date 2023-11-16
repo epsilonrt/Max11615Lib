@@ -44,7 +44,7 @@ typedef enum
     VDD_REF_EXT_CLK,
     REF_INP_INT_CLK,
     REF_OUT_INT_CLK
-}MAX11615Config_t
+}MAX11615Config_t;
 
 class MAX11615
 {
@@ -68,6 +68,6 @@ class MAX11615
     uint8_t _buf[3];
     uint8_t _inBuf[3];
     uint16_t _scanBuf[10];
-}
+};
 
 #endif
