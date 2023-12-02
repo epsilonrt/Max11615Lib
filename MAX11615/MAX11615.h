@@ -5,18 +5,14 @@
 //used for 
 #include <TeensyI2CDevice.h>
 #include <TeensyI2CBusIORegister.h>
+//#include <Wire.h>
 
 #define MAX11615_I2CADDR 0x33           // 0011 0011
 /**************************************************
 Setup Masks for MAX11615
 ***************************************************/
-#define MAX11615_SETUP_MASK 0x80                // 1000 0000
-#define MAX11615_SETUP_REFSEL_INPUT 0x20        // 0010 0000
-#define MAX11615_SETUP_REFSEL_OUTPUT 0x70       // 0110 0000
-#define MAX11615_SETUP_SETEXTERNAL_CLOCK 0x08   // 0000 1000
-#define MAX11615_SETUP_SETINTERNAL_CLOCK 0x00   // 0000 0000 //set to 0 on startup by default
-#define MAX11615_SETUP_SETUPBIPOLAR 0x06        // 0000 0100 //set to 0 on startupp by default
-
+#define MAX11615_SETUP_STD 0xA2                // 1010 0010 //Sets the standard mode of operation on the chip. Reference Data Sheet for what each bit means
+#define MAX11615_SETUP_EXTCLK 0xAA             // 1010 1010 //Sets the internal clock to use the external clock (MIGH BE USEFUL FOR SPEED)
 /**************************************************
 Config Masks for MAX11615
 ***************************************************/
@@ -40,34 +36,44 @@ Config Masks for MAX11615
  */
 typedef enum
 {
-    VDD_REF_INT_CLK = 1,
-    VDD_REF_EXT_CLK,
-    REF_INP_INT_CLK,
-    REF_OUT_INT_CLK
-}MAX11615Config_t;
+    CONFIG_STD,
+    CONFIG_EXTCLK
+}MAX11615_config_t;
 
+/*!
+ *  @brief Standard obejct class leveraging the TeensyI2CDevice libraries
+ */
 class MAX11615
 {
-    protected:
-    TeensyI2CDevice* m_i2c_dev;
     public:
     MAX11615();
     bool begin(uint8_t _i2cBus);
-    void init(MAX11615Config_t _c = MAX11615Config_t::VDD_REF_INT_CLK);
+    uint8_t configure(MAX11615_config_t _config = MAX11615_config_t::CONFIG_STD);
+    bool getBegun();
     uint16_t readADC_SingleEnded(uint8_t channel);
-    uint16_t readADC_Differential_0_1();
-    uint16_t readADC_Differential_2_3();
-    uint16_t readADC_Differential_4_5();
-    uint16_t readADC_Differential_6_7();
-    uint16_t* readADC_Scan();
-    float computeVolts(uint16_t counts);
     private:
-    void writeRegister(uint8_t reg, uint16_t value);
-    void writeRegister(uint8_t reg, uint8_t value);
-    uint16_t readRegister(uint8_t reg);
-    uint8_t _buf[3];
-    uint8_t _inBuf[3];
-    uint16_t _scanBuf[10];
+    TeensyI2CDevice* m_i2c_dev;
+    uint8_t addr;
+    bool begun;
+    bool configd = false;
+    uint8_t buffer[3];
 };
 
+/*!
+ *  @brief Standard obejct class leveraging the Wire.h library
+ */
+ /*
+class MAX11615_W
+{
+    public:
+    MAX11615_W();
+    bool begin(uint8_t _i2cBus);
+    bool getBegun();
+    uint16_t readADC_SingleEnded(uint8_t channel);
+    private:
+    TwoWire* m_i2c_dev;
+    uint8_t addr;
+    bool begun;
+}
+*/
 #endif
