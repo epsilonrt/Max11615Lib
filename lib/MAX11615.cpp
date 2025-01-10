@@ -87,7 +87,7 @@ int16_t MAX11615::readADC_SingleEnded(MAX11615_Channel_e channel)
         return 0;
     uint16_t conversion = MAX11615::getLastConversion();
     //Now, if we are running in bipolar mode, we will need to use 2s compliment..
-    if(this->setupByte & MAX11615_UNIPOLAR)
+    if(!(this->setupByte & MAX11615_UNIPOLAR))
         return (int16_t)conversion;
     //if in bipolar mode, we have to check if we are above 2^11
     //if we have a value greater than 2047 then we have a negative value
@@ -107,7 +107,7 @@ int16_t MAX11615::readADC_Differential(MAX11615_Channel_e channel)
     if(!this->sendByte(this->configByte))
         return 0;
     uint16_t conversion = MAX11615::getLastConversion();
-    if(this->setupByte & MAX11615_UNIPOLAR)
+    if(!(this->setupByte & MAX11615_UNIPOLAR))
         return (int16_t)conversion;
     //if in bipolar mode, we have to check if we are above 2^11
     //if we have a value greater than 2047 then we have a negative value
