@@ -4,12 +4,12 @@
 ///
 //  Copyright (c) 2023
 //  Author: Jacob Garner, mlgtex4127@gmail.com
-//  
+//
 //  Filename: MAX11615.h
 //
 //  Description:
 //  This code is designed to integrate functionality of the MAX11615 chip manufactured
-//  by Analog Devices/Maxim for the Teensy. I2C functionality is now supported for use with 
+//  by Analog Devices/Maxim for the Teensy. I2C functionality is now supported for use with
 //  the Teensy 4.1 micro controller.
 //
 ///
@@ -61,13 +61,13 @@
 
 #pragma region Config_Byte_Formatters
 /* Setup Byte defined as follows
-    
+
     Bit | Name      | Description
     7   | REG       | Register bit | 1 == setup byte, 0 == config byte
     6   | SCAN1     | Scan bits, see defines or docs for description
     5   | SCAN2     | --
     4   | CS3       | --
-    3   | CS2       | Channel select pins 
+    3   | CS2       | Channel select pins
     2   | CS1       | See defines or docs for description
     1   | CS0       |--
     0   | SGL\DIF   | 1 == single ended, 0 == differential
@@ -99,85 +99,82 @@
 
 
 /*
-//I am super indecisive... so below are the explicity channel calls, I decided to move to just setting the cs bits and changing differential or single ended in function calls...
-#define MAX11615_CHANNEL_AIN0_GND   0x01    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN1_GND   0x03    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN2_GND   0x05    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN3_GND   0x07    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN4_GND   0x09    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN5_GND   0x0B    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN6_GND   0x0D    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN7_GND   0x0F    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN8_GND   0x11    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN9_GND   0x13    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN10_GND  0x15    //Sets channel to single ended AIN0 vs GND
-#define MAX11615_CHANNEL_AIN11_GND  0x17    //Sets channel to single ended AIN0 vs GND
+  //I am super indecisive... so below are the explicity channel calls, I decided to move to just setting the cs bits and changing differential or single ended in function calls...
+  #define MAX11615_CHANNEL_AIN0_GND   0x01    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN1_GND   0x03    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN2_GND   0x05    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN3_GND   0x07    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN4_GND   0x09    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN5_GND   0x0B    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN6_GND   0x0D    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN7_GND   0x0F    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN8_GND   0x11    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN9_GND   0x13    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN10_GND  0x15    //Sets channel to single ended AIN0 vs GND
+  #define MAX11615_CHANNEL_AIN11_GND  0x17    //Sets channel to single ended AIN0 vs GND
 
-#define MAX11615_CHANNEL_AIN0_AIN1   0x00    //Sets Channel to differential AIN0  (+) vs AIN1  (-)
-#define MAX11615_CHANNEL_AIN1_AIN0   0x00    //Sets Channel to differential AIN1  (+) vs AIN0  (-)
-#define MAX11615_CHANNEL_AIN2_AIN3   0x00    //Sets Channel to differential AIN2  (+) vs AIN3  (-)
-#define MAX11615_CHANNEL_AIN3_AIN2   0x00    //Sets Channel to differential AIN3  (+) vs AIN2  (-)
-#define MAX11615_CHANNEL_AIN4_AIN5   0x00    //Sets Channel to differential AIN4  (+) vs AIN5  (-)
-#define MAX11615_CHANNEL_AIN5_AIN4   0x00    //Sets Channel to differential AIN5  (+) vs AIN4  (-)
-#define MAX11615_CHANNEL_AIN6_AIN7   0x00    //Sets Channel to differential AIN6  (+) vs AIN7  (-)
-#define MAX11615_CHANNEL_AIN7_AIN6   0x00    //Sets Channel to differential AIN7  (+) vs AIN6  (-)
-#define MAX11615_CHANNEL_AIN8_AIN9   0x00    //Sets Channel to differential AIN8  (+) vs AIN9  (-)
-#define MAX11615_CHANNEL_AIN9_AIN8   0x00    //Sets Channel to differential AIN9  (+) vs AIN8  (-)
-#define MAX11615_CHANNEL_AIN10_AIN11 0x00    //Sets Channel to differential AIN10 (+) vs AIN11 (-)
-#define MAX11615_CHANNEL_AIN11_AIN10 0x00    //Sets Channel to differential AIN11 (+) vs AIN10 (-)
+  #define MAX11615_CHANNEL_AIN0_AIN1   0x00    //Sets Channel to differential AIN0  (+) vs AIN1  (-)
+  #define MAX11615_CHANNEL_AIN1_AIN0   0x00    //Sets Channel to differential AIN1  (+) vs AIN0  (-)
+  #define MAX11615_CHANNEL_AIN2_AIN3   0x00    //Sets Channel to differential AIN2  (+) vs AIN3  (-)
+  #define MAX11615_CHANNEL_AIN3_AIN2   0x00    //Sets Channel to differential AIN3  (+) vs AIN2  (-)
+  #define MAX11615_CHANNEL_AIN4_AIN5   0x00    //Sets Channel to differential AIN4  (+) vs AIN5  (-)
+  #define MAX11615_CHANNEL_AIN5_AIN4   0x00    //Sets Channel to differential AIN5  (+) vs AIN4  (-)
+  #define MAX11615_CHANNEL_AIN6_AIN7   0x00    //Sets Channel to differential AIN6  (+) vs AIN7  (-)
+  #define MAX11615_CHANNEL_AIN7_AIN6   0x00    //Sets Channel to differential AIN7  (+) vs AIN6  (-)
+  #define MAX11615_CHANNEL_AIN8_AIN9   0x00    //Sets Channel to differential AIN8  (+) vs AIN9  (-)
+  #define MAX11615_CHANNEL_AIN9_AIN8   0x00    //Sets Channel to differential AIN9  (+) vs AIN8  (-)
+  #define MAX11615_CHANNEL_AIN10_AIN11 0x00    //Sets Channel to differential AIN10 (+) vs AIN11 (-)
+  #define MAX11615_CHANNEL_AIN11_AIN10 0x00    //Sets Channel to differential AIN11 (+) vs AIN10 (-)
 */
 
 #pragma Config_Byte_Formatters
 
 /// @brief Selection Enum for Channel to measure
-typedef enum
-{
-    MAX11615_AIN0  = MAX11615_CHANNEL_AIN0,
-    MAX11615_AIN1  = MAX11615_CHANNEL_AIN1,
-    MAX11615_AIN2  = MAX11615_CHANNEL_AIN2,
-    MAX11615_AIN3  = MAX11615_CHANNEL_AIN3,
-    MAX11615_AIN4  = MAX11615_CHANNEL_AIN4,
-    MAX11615_AIN5  = MAX11615_CHANNEL_AIN5,
-    MAX11615_AIN6  = MAX11615_CHANNEL_AIN6,
-    MAX11615_AIN7  = MAX11615_CHANNEL_AIN7,
-    MAX11615_AIN8  = MAX11615_CHANNEL_AIN8,
-    MAX11615_AIN9  = MAX11615_CHANNEL_AIN9,
-    MAX11615_AIN10 = MAX11615_CHANNEL_AIN10,
-    MAX11615_AIN11 = MAX11615_CHANNEL_AIN11
+typedef enum {
+  MAX11615_AIN0  = MAX11615_CHANNEL_AIN0,
+  MAX11615_AIN1  = MAX11615_CHANNEL_AIN1,
+  MAX11615_AIN2  = MAX11615_CHANNEL_AIN2,
+  MAX11615_AIN3  = MAX11615_CHANNEL_AIN3,
+  MAX11615_AIN4  = MAX11615_CHANNEL_AIN4,
+  MAX11615_AIN5  = MAX11615_CHANNEL_AIN5,
+  MAX11615_AIN6  = MAX11615_CHANNEL_AIN6,
+  MAX11615_AIN7  = MAX11615_CHANNEL_AIN7,
+  MAX11615_AIN8  = MAX11615_CHANNEL_AIN8,
+  MAX11615_AIN9  = MAX11615_CHANNEL_AIN9,
+  MAX11615_AIN10 = MAX11615_CHANNEL_AIN10,
+  MAX11615_AIN11 = MAX11615_CHANNEL_AIN11
 } MAX11615_Channel_e;
 
 /// @brief Selection Enum for Reference type
-typedef enum
-{
-    MAX11615_REF_VDD  = MAX11615_REFERENCE_VDD,
-    MAX11615_REF_EXT  = MAX11615_REFERENCE_EXT,
-    MAX11615_REF_INT1 = MAX11615_REFERENCE_INT1,
-    MAX11615_REF_INT2 = MAX11615_REFERENCE_INT2,
-    MAX11615_REF_INT3 = MAX11615_REFERENCE_INT3,
-    MAX11615_REF_INT4 = MAX11615_REFERENCE_INT4,
+typedef enum {
+  MAX11615_REF_VDD  = MAX11615_REFERENCE_VDD,
+  MAX11615_REF_EXT  = MAX11615_REFERENCE_EXT,
+  MAX11615_REF_INT1 = MAX11615_REFERENCE_INT1,
+  MAX11615_REF_INT2 = MAX11615_REFERENCE_INT2,
+  MAX11615_REF_INT3 = MAX11615_REFERENCE_INT3,
+  MAX11615_REF_INT4 = MAX11615_REFERENCE_INT4,
 } MAX11615_Reference_e;
 
-class MAX11615
-{
-    public:
-    MAX11615(TwoWire* i2c_bus = &Wire);
+class MAX11615 {
+  public:
+    MAX11615 (TwoWire *i2c_bus = &Wire);
     bool begin();
-    void setReference(MAX11615_Reference_e ref = MAX11615_Reference_e::MAX11615_REF_VDD);
-    void setClock(bool useInternalClock);
-    void setPolarity(bool bipolar);
+    void setReference (MAX11615_Reference_e ref = MAX11615_Reference_e::MAX11615_REF_VDD);
+    void setClock (bool useInternalClock);
+    void setPolarity (bool bipolar);
     bool getBegun();
 
-    int16_t readADC_SingleEnded(MAX11615_Channel_e channel = MAX11615_Channel_e::MAX11615_AIN0);
-    int16_t readADC_Differential(MAX11615_Channel_e channel = MAX11615_Channel_e::MAX11615_AIN0);
+    int16_t readADC_SingleEnded (MAX11615_Channel_e channel = MAX11615_Channel_e::MAX11615_AIN0);
+    int16_t readADC_Differential (MAX11615_Channel_e channel = MAX11615_Channel_e::MAX11615_AIN0);
 
-    private:
-    TwoWire* m_i2c_dev;
+  private:
+    TwoWire *m_i2c_dev;
     uint8_t addr;
     bool begun;
     int gainPin;
     uint8_t setupByte;
     uint8_t configByte;
     uint16_t lastConversion = 0;
-    bool sendByte(uint8_t data);
+    bool sendByte (uint8_t data);
     uint16_t getLastConversion();
 };
