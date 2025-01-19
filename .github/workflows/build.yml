@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # example: [examples/*/*]
+        example: [examples/SimplestDemo/SimplestDemo, examples/SingleEndedSweep/SingleEndedSweep, examples/DifferentialSweep/DifferentialSweep]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.platformio/.cache
+        key: ${{ runner.os }}-pio
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install PlatformIO Core
+      run: pip install --upgrade platformio
+    - name: Step 6 - Run build examples using PlatformIO
+      run: pio ci --lib="." -b esp32-c3-devkitm-1 -b teensy41 
+      env:
+        PLATFORMIO_CI_SRC: ${{ matrix.example }}

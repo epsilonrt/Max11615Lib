@@ -2,8 +2,9 @@
 
 //////////////////////////////////////////////////////////
 ///
-//  Copyright (c) 2023
+//  Copyright (c) 2023-2025
 //  Author: Jacob Garner, mlgtex4127@gmail.com
+//          Pascal JEAN, epsilonrt@gmail.com
 //
 //  Filename: MAX11615.h
 //
@@ -18,7 +19,12 @@
 #include "Arduino.h"
 #include <Wire.h>
 
+#define MAX11612_ADDR_DEFAULT 0x34
+#define MAX11613_ADDR_DEFAULT 0x34
+#define MAX11614_ADDR_DEFAULT 0x33
 #define MAX11615_ADDR_DEFAULT 0x33
+#define MAX11616_ADDR_DEFAULT 0x35
+#define MAX11617_ADDR_DEFAULT 0x35
 
 /*  Setup vs Config
     The setup byte is used to set global configurations
@@ -26,8 +32,6 @@
 */
 #define MAX11615_SETUP_MASK         0x7F    //Used to set our msb to 1 signalling a setup byte. We will &= our outgoing byte with this
 #define MAX11615_CONFIG_MASK        0xFF    //Used to set our msb to 0 signalling a config byte.
-
-#pragma region Setup_Byte_Foratters
 
 /* Config Byte defined as follows
     Bit | Name      | Description
@@ -56,10 +60,8 @@
 #define MAX11615_BIPOLAR            0x02    //Sets bit 2 to 1 configuring bipolar measurements
 #define MAX11615_UNIPOLAR           0x00    //Sets bit 2 to 0 configuring unipolar measurements
 
-#pragma endregion Setup_Byte_Foratters
 
 
-#pragma region Config_Byte_Formatters
 /* Setup Byte defined as follows
 
     Bit | Name      | Description
@@ -127,54 +129,81 @@
   #define MAX11615_CHANNEL_AIN11_AIN10 0x00    //Sets Channel to differential AIN11 (+) vs AIN10 (-)
 */
 
-#pragma Config_Byte_Formatters
-
-/// @brief Selection Enum for Channel to measure
-typedef enum {
-  MAX11615_AIN0  = MAX11615_CHANNEL_AIN0,
-  MAX11615_AIN1  = MAX11615_CHANNEL_AIN1,
-  MAX11615_AIN2  = MAX11615_CHANNEL_AIN2,
-  MAX11615_AIN3  = MAX11615_CHANNEL_AIN3,
-  MAX11615_AIN4  = MAX11615_CHANNEL_AIN4,
-  MAX11615_AIN5  = MAX11615_CHANNEL_AIN5,
-  MAX11615_AIN6  = MAX11615_CHANNEL_AIN6,
-  MAX11615_AIN7  = MAX11615_CHANNEL_AIN7,
-  MAX11615_AIN8  = MAX11615_CHANNEL_AIN8,
-  MAX11615_AIN9  = MAX11615_CHANNEL_AIN9,
-  MAX11615_AIN10 = MAX11615_CHANNEL_AIN10,
-  MAX11615_AIN11 = MAX11615_CHANNEL_AIN11
-} MAX11615_Channel_e;
-
-/// @brief Selection Enum for Reference type
-typedef enum {
-  MAX11615_REF_VDD  = MAX11615_REFERENCE_VDD,
-  MAX11615_REF_EXT  = MAX11615_REFERENCE_EXT,
-  MAX11615_REF_INT1 = MAX11615_REFERENCE_INT1,
-  MAX11615_REF_INT2 = MAX11615_REFERENCE_INT2,
-  MAX11615_REF_INT3 = MAX11615_REFERENCE_INT3,
-  MAX11615_REF_INT4 = MAX11615_REFERENCE_INT4,
-} MAX11615_Reference_e;
-
 class MAX11615 {
   public:
-    MAX11615 (TwoWire *i2c_bus = &Wire);
-    bool begin();
-    void setReference (MAX11615_Reference_e ref = MAX11615_Reference_e::MAX11615_REF_VDD);
-    void setClock (bool useInternalClock);
-    void setPolarity (bool bipolar);
-    bool getBegun();
 
-    int16_t readADC_SingleEnded (MAX11615_Channel_e channel = MAX11615_Channel_e::MAX11615_AIN0);
-    int16_t readADC_Differential (MAX11615_Channel_e channel = MAX11615_Channel_e::MAX11615_AIN0);
+    /// @brief Selection Enum for Reference type
+    enum Reference {
+      REF_VDD  = MAX11615_REFERENCE_VDD,
+      REF_EXT  = MAX11615_REFERENCE_EXT,
+      REF_INT1 = MAX11615_REFERENCE_INT1,
+      REF_INT2 = MAX11615_REFERENCE_INT2,
+      REF_INT3 = MAX11615_REFERENCE_INT3,
+      REF_INT4 = MAX11615_REFERENCE_INT4,
+    } ;
+
+    /// @brief Selection Enum for Channel to measure
+    enum Channel {
+      AIN0  = MAX11615_CHANNEL_AIN0,
+      AIN1  = MAX11615_CHANNEL_AIN1,
+      AIN2  = MAX11615_CHANNEL_AIN2,
+      AIN3  = MAX11615_CHANNEL_AIN3,
+      AIN4  = MAX11615_CHANNEL_AIN4,
+      AIN5  = MAX11615_CHANNEL_AIN5,
+      AIN6  = MAX11615_CHANNEL_AIN6,
+      AIN7  = MAX11615_CHANNEL_AIN7,
+      AIN8  = MAX11615_CHANNEL_AIN8,
+      AIN9  = MAX11615_CHANNEL_AIN9,
+      AIN10 = MAX11615_CHANNEL_AIN10,
+      AIN11 = MAX11615_CHANNEL_AIN11
+    } ;
+
+    /// @brief Default Constructor
+    /// @param slave_addr the address of the chip on the I2C bus
+    /// Default config byte 0b01100001: Single Ended, AIN0, No scan
+    /// Default setup byte  0b10000010: Reference VDD, Internal Clock, Unipolar
+    MAX11615 (uint8_t slave_addr = MAX11615_ADDR_DEFAULT);
+
+    /// @brief Initializes the chip on the I2C bus
+    /// @param i2c_bus the I2C bus on which coms will be handled
+    /// @return true if the chip is initialized, false if not
+    bool begin (TwoWire &i2c_bus = Wire);
+
+    /// @brief Sets the voltage reference based on the passed parameter
+    /// @param ref the desired voltage reference/pin config
+    void setReference (Reference ref = REF_VDD);
+
+    /// @brief Sets the clock of the chip to either internal or external
+    /// @param useInternalClock if true, internal clock is used, if false, external clock is used
+    void setClock (bool useInternalClock);
+
+    /// @brief Sets the polarity of the chip to bipolar or unipolar based on the parameter
+    /// @param bipolar bipolar == true, unipolar == false
+    void setPolarity (bool bipolar);
+
+    /// @brief getter for the connection status of the chip
+    /// @return true if the chip is still connected/begun, false if not
+    bool isConnected() const;
+
+    /// @brief Reads a selected channel in a single ended format
+    /// @param channel the desired channel to read
+    /// @return The numerical values obtained after conversion are adjusted based on the polarity of the input signal. INT16_MAX if the chip does not respond
+    int16_t readSingleEnded (Channel channel = AIN0);
+
+    /// @brief Reads a set of channels in differential format
+    /// @param channel the desired channel to be the positive input
+    /// @return The numerical values obtained after conversion are adjusted based on the polarity of the input signal. INT16_MAX if the chip does not respond
+    int16_t readDifferential (Channel channel = AIN0);
 
   private:
     TwoWire *m_i2c_dev;
-    uint8_t addr;
-    bool begun;
-    int gainPin;
-    uint8_t setupByte;
-    uint8_t configByte;
-    uint16_t lastConversion = 0;
+    uint8_t m_slave_addr;
+    bool m_isconnected;
+    uint8_t m_setup_byte;
+    uint8_t m_config_byte;
+    uint16_t m_last_conversion;
+
+  private:
     bool sendByte (uint8_t data);
     uint16_t getLastConversion();
 };
