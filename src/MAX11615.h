@@ -129,6 +129,12 @@
   #define MAX11615_CHANNEL_AIN11_AIN10 0x00    //Sets Channel to differential AIN11 (+) vs AIN10 (-)
 */
 
+/**
+ * @brief MAX11615 Class
+ * 
+ * This class is designed to interface with the MAX11615 chip manufactured by Analog Devices/Maxim
+ * 
+ */
 class MAX11615 {
   public:
 
